@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background: #000000;
+    color: #ffffff;
+  }
+  
+  html {
+    background: #000000;
+  }
+}
+
+/* Tremor dark theme overrides */
+:root {
+  --tremor-background-muted: #0a0a0a;
+  --tremor-border-default: #1a1a1a;
+}
+
+/* Custom scrollbar for horizontal scroll */
+.horizontal-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
