@@ -1,0 +1,23 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/forecast/cost/page": "app/forecast/cost/page.js",
+  "/forecast/load/page": "app/forecast/load/page.js",
+  "/forecast/trend/page": "app/forecast/trend/page.js",
+  "/page": "app/page.js",
+  "/route/constraint/page": "app/route/constraint/page.js",
+  "/route/depot/page": "app/route/depot/page.js",
+  "/route/master/page": "app/route/master/page.js",
+  "/route/packaging/page": "app/route/packaging/page.js",
+  "/route/matrix/page": "app/route/matrix/page.js",
+  "/route/part/page": "app/route/part/page.js",
+  "/route/truck/page": "app/route/truck/page.js",
+  "/route/vendor/page": "app/route/vendor/page.js",
+  "/sim/compare/page": "app/sim/compare/page.js",
+  "/sim/ga/page": "app/sim/ga/page.js",
+  "/sim/matheuristic/page": "app/sim/matheuristic/page.js",
+  "/sim/nearest-neighbour/page": "app/sim/nearest-neighbour/page.js",
+  "/sim/overview/page": "app/sim/overview/page.js",
+  "/sim/scenario/page": "app/sim/scenario/page.js",
+  "/utils/data/page": "app/utils/data/page.js",
+  "/utils/settings/page": "app/utils/settings/page.js"
+}
