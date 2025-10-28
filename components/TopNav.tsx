@@ -36,7 +36,8 @@ export default function TopNav() {
             onMouseEnter={() => setHoveredMenu(menu.key)}
             onMouseLeave={() => setHoveredMenu(null)}
           >
-            <button
+            <Link
+              href={menu.items[0].href || "/"}
               onClick={() => setActiveMenu(menu.key)}
               className={`flex items-center gap-1 rounded px-4 py-2 text-sm font-medium transition-colors ${
                 currentActiveMenu === menu.key
@@ -46,7 +47,7 @@ export default function TopNav() {
             >
               {menu.label}
               <ChevronDownIcon className="h-4 w-4" />
-            </button>
+            </Link>
 
             {/* Hover Dropdown */}
             {hoveredMenu === menu.key && menu.items && (
