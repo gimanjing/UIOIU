@@ -201,8 +201,8 @@ export default function NearestNeighbourLivePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-white">Nearest Neighbour (Live)</h1>
-        <Text className="mt-2 text-neutral-400">
-          Backed by Supabase: depots, vendors, and distance/duration are loaded live from your truck_* tables.
+        <Text className="mt-2 text-neutral-400">Backed by bajingan bedes: depots, vendors, and distance/duration are loaded live from your truck_* tables.
+          
         </Text>
       </div>
 
