@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { PostgrestError } from "@supabase/supabase-js";
 
 // Tremor UI
 import { Card, Grid, Metric, Text, NumberInput, TextInput, Button, Title, BarList, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, BadgeDelta, DeltaType } from "@tremor/react";
