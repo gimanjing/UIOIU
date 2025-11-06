@@ -1,18 +1,28 @@
-// app/route/nearest-neighbour/page.tsx (or any route you prefer)
+// app/sim/nearest-neighbour/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { PostgrestError } from "@supabase/supabase-js";
 
-// Tremor UI
-import { Card, Grid, Metric, Text, NumberInput, TextInput, Button, Title, BarList, Table, TableBody, TableCell, TableHead, CellCell, TableRow } from "@tremor/react";
+// Tremor UI (v3+): use TableHeaderCell instead of TableHeader
+import {
+  Card,
+  Grid,
+  Metric,
+  Text,
+  NumberInput,
+  TextInput,
+  Button,
+  Title,
+  BarList,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@tremor/react";
 
-// If you already have a Supabase client (e.g., '@/lib/supabase'), prefer that import.
-// Otherwise, uncomment the next 5 lines and ensure env vars are exposed to the browser.
-// import { createClient } from "@supabase/supabase-js";
-// const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL!;
-// const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY!;
-// export const supabase = createClient(supabaseUrl, supabaseAnon);
+// Your client: can be the official supabase-js createClient or a REST shim with the same surface
 import { supabase } from "@/lib/supabase";
 
 // -----------------------------
@@ -44,6 +54,9 @@ export type DistanceRow = {
   updated_at?: string | null;
 };
 
+// If you aren't importing PostgrestError from supabase-js, keep a tiny local shape
+type PostgrestError = { message: string };
+
 // -----------------------------
 // Utilities
 // -----------------------------
@@ -53,11 +66,6 @@ function km(n?: number | null) {
 
 function minutes(n?: number | null) {
   return (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
-}
-
-function safeDelta(a = 0, b = 0): DeltaType {
-  if (a === b) return "unchanged";
-  return a < b ? "decrease" : "increase";
 }
 
 // Greedy Nearest Neighbour (purely client-side preview)
@@ -118,28 +126,27 @@ export default function NearestNeighbourLivePage() {
         setError(null);
 
         const [depotsRes, vendorsRes, distRes] = await Promise.all([
-          supabase.from("truck_depots").select("id, code, name, lat, lng"),
-          supabase.from("truck_vendors").select("id, code, name, lat, lng, load"),
+          supabase.from("truck_depots").select<Depot>("id, code, name, lat, lng"),
+          supabase.from("truck_vendors").select<Vendor>("id, code, name, lat, lng, load"),
           supabase
             .from("truck_distance_vendor")
-            .select("id, depot_id, vendor_id, distance_km, duration_min, updated_at"),
+            .select<DistanceRow>("id, depot_id, vendor_id, distance_km, duration_min, updated_at"),
         ]);
 
         if (!isMounted) return;
-        if (depotsRes.error) throw depotsRes.error;
-        if (vendorsRes.error) throw vendorsRes.error;
-        if (distRes.error) throw distRes.error;
+        if ((depotsRes as any).error) throw (depotsRes as any).error as PostgrestError;
+        if ((vendorsRes as any).error) throw (vendorsRes as any).error as PostgrestError;
+        if ((distRes as any).error) throw (distRes as any).error as PostgrestError;
 
-        setDepots(depotsRes.data ?? []);
-        setVendors(vendorsRes.data ?? []);
-        setDistances(distRes.data ?? []);
+        setDepots(((depotsRes as any).data ?? []) as Depot[]);
+        setVendors(((vendorsRes as any).data ?? []) as Vendor[]);
+        setDistances(((distRes as any).data ?? []) as DistanceRow[]);
 
-        if ((depotsRes.data?.length ?? 0) > 0) {
-          setSelectedDepotId(depotsRes.data![0].id);
-        }
+        const d0 = ((depotsRes as any).data ?? []) as Depot[];
+        if (d0.length > 0) setSelectedDepotId(d0[0].id);
       } catch (e: any) {
         if (!isMounted) return;
-        setError(e);
+        setError({ message: e?.message ?? String(e) });
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -232,16 +239,19 @@ export default function NearestNeighbourLivePage() {
               onChange={e => setDepotQuery(e.target.value)}
             />
             <div className="mt-2 flex gap-2 flex-wrap">
-              {filteredDepots.slice(0, 8).map(d => (
-                <Button
-                  key={String(d.id)}
-                  size="xs"
-                  variant={String(selectedDepotId) === String(d.id) ? "primary" : "secondary"}
-                  onClick={() => setSelectedDepotId(d.id)}
-                >
-                  {d.code || d.name || d.id}
-                </Button>
-              ))}
+              {filteredDepots.slice(0, 8).map(d => {
+                const isActive = String(selectedDepotId) === String(d.id);
+                return (
+                  <Button
+                    key={String(d.id)}
+                    size="xs"
+                    className={isActive ? "bg-white text-black" : "bg-pitch-black border-pitch-border text-white"}
+                    onClick={() => setSelectedDepotId(d.id)}
+                  >
+                    {d.code || d.name || d.id}
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
@@ -267,7 +277,7 @@ export default function NearestNeighbourLivePage() {
           </div>
 
           <div className="flex items-end">
-            <Button  onClick={() => { setVendorQuery(""); setDepotQuery(""); setMaxDistanceKm(undefined); }}>
+            <Button className="bg-pitch-black border-pitch-border text-white" onClick={() => { setVendorQuery(""); setDepotQuery(""); setMaxDistanceKm(undefined); }}>
               Clear Filters
             </Button>
           </div>
@@ -299,10 +309,11 @@ export default function NearestNeighbourLivePage() {
 
               <Table className="mt-4">
                 <TableHead>
-       <TableRow>
-         <TableHeaderCell>#</TableHeaderCell>
-         <TableHeaderCelableHeaderCell>
-                    <Tell>Load</TableHeaderC            </TableRow>
+                  <TableRow>
+                    <TableHeaderCell>#</TableHeaderCell>
+                    <TableHeaderCell>Vendor</TableHeaderCell>
+                    <TableHeaderCell>Load</TableHeaderCell>
+                  </TableRow>
                 </TableHead>
                 <TableBody>
                   {nnPreview.sequence.map((v, i) => (
@@ -349,13 +360,15 @@ export default function NearestNeighbourLivePage() {
         <Table className="mt-4">
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Vendor<rCell>
-              <Tall>Distance (km)</TableHeaderCel      <TableHeaderCell>DurationleHeaderCell>
-              <Tabl>Updated</TableHeaderCell>
-    ableRow>
+              <TableHeaderCell>Vendor</TableHeaderCell>
+              <TableHeaderCell>Distance (km)</TableHeaderCell>
+              <TableHeaderCell>Duration (min)</TableHeaderCell>
+              <TableHeaderCell>Updated</TableHeaderCell>
+            </TableRow>
           </TableHead>
-TableBody>
-            {d            .filter(r => selectedDepotId && String(r.depot_id) === String(selectedDepotId))
+          <TableBody>
+            {distances
+              .filter(r => selectedDepotId && String(r.depot_id) === String(selectedDepotId))
               .filter(r => (maxDistanceKm == null) || ((r.distance_km ?? Infinity) <= maxDistanceKm))
               .sort((a,b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
               .slice(0, 200)
