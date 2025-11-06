@@ -2,9 +2,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { PostgrestError } from "@supabase/supabase-js";
 
 // Tremor UI
-import { Card, Grid, Metric, Text, NumberInput, TextInput, Button, Title, BarList, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, BadgeDelta, DeltaType } from "@tremor/react";
+import { Card, Grid, Metric, Text, NumberInput, TextInput, Button, Title, BarList, Table, TableBody, TableCell, TableHead, CellCell, TableRow } from "@tremor/react";
 
 // If you already have a Supabase client (e.g., '@/lib/supabase'), prefer that import.
 // Otherwise, uncomment the next 5 lines and ensure env vars are exposed to the browser.
@@ -259,14 +260,14 @@ export default function NearestNeighbourLivePage() {
             <NumberInput
               placeholder="e.g., 300"
               className="bg-pitch-black border-pitch-border text-white"
-              value={maxDistanceKm as any}
-              onValueChange={(v) => setMaxDistanceKm(v as unknown as number)}
+              value={typeof maxDistanceKm === "number" ? maxDistanceKm : undefined}
+              onValueChange={(v) => setMaxDistanceKm(typeof v === "number" ? v : undefined)}
               enableStepper={false}
             />
           </div>
 
           <div className="flex items-end">
-            <Button variant="secondary" onClick={() => { setVendorQuery(""); setDepotQuery(""); setMaxDistanceKm(undefined); }}>
+            <Button  onClick={() => { setVendorQuery(""); setDepotQuery(""); setMaxDistanceKm(undefined); }}>
               Clear Filters
             </Button>
           </div>
@@ -298,11 +299,10 @@ export default function NearestNeighbourLivePage() {
 
               <Table className="mt-4">
                 <TableHead>
-                  <TableRow>
-                    <TableHeader>#</TableHeader>
-                    <TableHeader>Vendor</TableHeader>
-                    <TableHeader>Load</TableHeader>
-                  </TableRow>
+       <TableRow>
+         <TableHeaderCell>#</TableHeaderCell>
+         <TableHeaderCelableHeaderCell>
+                    <Tell>Load</TableHeaderC            </TableRow>
                 </TableHead>
                 <TableBody>
                   {nnPreview.sequence.map((v, i) => (
@@ -349,15 +349,13 @@ export default function NearestNeighbourLivePage() {
         <Table className="mt-4">
           <TableHead>
             <TableRow>
-              <TableHeader>Vendor</TableHeader>
-              <TableHeader>Distance (km)</TableHeader>
-              <TableHeader>Duration (min)</TableHeader>
-              <TableHeader>Updated</TableHeader>
-            </TableRow>
+              <TableHeaderCell>Vendor<rCell>
+              <Tall>Distance (km)</TableHeaderCel      <TableHeaderCell>DurationleHeaderCell>
+              <Tabl>Updated</TableHeaderCell>
+    ableRow>
           </TableHead>
-          <TableBody>
-            {distances
-              .filter(r => selectedDepotId && String(r.depot_id) === String(selectedDepotId))
+TableBody>
+            {d            .filter(r => selectedDepotId && String(r.depot_id) === String(selectedDepotId))
               .filter(r => (maxDistanceKm == null) || ((r.distance_km ?? Infinity) <= maxDistanceKm))
               .sort((a,b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
               .slice(0, 200)
