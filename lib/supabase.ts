@@ -1,8 +1,8 @@
 // lib/supabase.ts — REST-only shim, zero external deps
 type PostgrestError = { message: string };
 
-const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-const SB_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+const SB_URL = process.env.SUPABASE_URL as string;
+const SB_KEY = process.env.SUPABASE_ANON_KEY as string;
 
 async function get<T>(
   table: string,
